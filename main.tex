@@ -1,0 +1,57 @@
+\documentclass[10pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=1in]{geometry}
+\usepackage{url}
+
+\title{Sixth Annual Systems Research Workshop}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+% Video Playback Stability is an important metric contributing to perceived quality of experience. In my work I evaluate the impact of different congestion control algorithms with respect to video stability in typical UK-wide connectivity scenarios. In particular, I compare TCP reno as defined in Linux Kernel 5.4 series and TCP Reno with New Congestion Window Validation (RFC 7661 enabled). New Congestion Window Validation is a proposal optimizing for connection transfer rate stability. Our research investigates whether the higher transport stability of New Congestion Window Validation translates in higher application Quality of Experience (e..g, more stable playback).
+
+% \section*{Project State \& Expectations}
+
+% The groundwork for the research has been carried. I am planning on presenting our early findings and to layout our plan going forward. In UKSys `21 I hope to receive feedback on my work so far and to validate the next steps
+
+Video playback stability is a key component contributing to the user' quality of experience. Adaptive algorithms are responsible for delivering it. The algorithms are mainly throughput or buffer based, or use a combination of the two. Throughput algorithms are known to achieve lower stability compared to their buffer-based counterparts \cite{Spiteri-2016-Bola}.
+
+% Paragraph 2: What is the specific problem considered in this paper? This
+% paragraph narrows down the topic area of the paper. In the first
+% paragraph you have established general context and importance. Here you
+% establish specific context and background.
+
+Adaptive algorithms have to deliver video while picking a representation that ``best'' reflects the network's conditions in real time. This is a challenging task since multiple criteria need to be fulfilled, including: high stability, high quality, and low video stalls. These often conflict one another. For instance, an algorithm that always picks the lowest available representation regardless of the state of the network will achieve low video stall time and high stability. However, this would also achieve low video quality, even in cases where the link was able to sustain better quality.
+
+Thus, dynamic, real-time decisions achieving high index on one of these criterion can come at the cost of hindered performance of another. Modern adaptive algorithms try to balance that trade-off by using heuristics to gauge the state of the network. These can be: the pre-buffered video length at the client, or past knowledge of the network obtained through previous downloads. Algorithms leveraging the former are known as buffer and the latter as throughput based. 
+
+In DASH's reference implementation, one of the main adaptive algorithms: ``throughput'' is known to have lower stability compared to its alternatives \cite{Spiteri-2016-Bola}. A reason for that might be the on-off nature of the HTTP video delivery. In it the connection exhibits idle periods, i.e., periods where no (useful) information being exchanged. During these, window based congestion control as defined in Linux Kernel 5.x series has no way to gauge verify the link capacity. In such cases it would invalidate the TCP window by resetting the connection's show start threshold state. In contrast, New Congestion Window Validation is a proposal that keeps its slow-start state even during these idle periods. This allows connections using it to resume their previous sending rate faster and without a need of re-probing the network or otherwise entering slow-start again.
+
+% Paragraph 3: "In this paper, we show that...". This is the key paragraph
+% in the introduction - you summarize, in one paragraph, what are the main
+% contributions of your paper, given the context established in paragraphs
+% 1 and 2. What's the general approach taken? Why are the specific results
+% significant? The story is not what you did, but rather:
+%  - what you show, new ideas, new insights
+%  - why interesting, important?
+% State your contributions: these drive the entire paper.  Contributions
+% should be refutable claims, not vague generic statements.
+
+Our work investigates whether the higher stability in the transport layer for New Congestion Window Validation connections translates to higher video playback stability or otherwise higher QoE. To test our hypothesis, we compare two video streams using TCP Reno. One as defined in the kernel and one with New Congestion Window Validation enabled. To measure video stability and overall QoE we collect standard video performance metrics: average bit-rate, bit-rate oscillation, and video stall time. We carry our experiments using TCP Reno, as recent work reported that Netflix used it for their video traffic \cite{Mishra-2019-the-great-internet-tcp-congestion-control-census}.
+
+% Paragraph 4: What are the differences between your work, and what others
+% have done? Keep this at a high level, as you can refer to future sections
+% where specific details and differences will be given, but it is important
+% for the reader to know what is new about this work compared to other work
+% in the area.
+
+To the best of our knowledge, this is the first paper that studies New CWV's impact on video playback stability. For our experiments we used links representative of the majority of the households within the UK \cite{online-ofcom-report}. With respect to new congestion window validation, our preliminary results show that there is no difference in terms of application performance regardless whether the feature is enabled or not. However, we find that clients using it consistently converge at lower link capacity estimations. Additionally, we confirm that when New Congestion Window Validation is used the on-off periods are easier to model. 
+
+At UKSys '21 I hope to receive feedback for our initial work, to validate the future plan, and to find out how extend the research to make it more applicable. 
+
+\bibliographystyle{abbrv}
+\bibliography{references.bib}
+
+\end{document}
